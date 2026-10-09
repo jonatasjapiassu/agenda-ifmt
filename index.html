@@ -81,6 +81,13 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
 .dot.live{background:var(--accent)} .dot.snap{background:var(--warn)}
 .tbtn{font:inherit;font-size:.8rem;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:3px 9px;cursor:pointer}
 body{margin:0;padding-top:env(safe-area-inset-top,0px)}
+.inst{display:none;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;padding:12px 14px}
+.inst.show{display:flex}
+.inst img{width:48px;height:48px;border-radius:11px;flex:none}
+.inst .tx{flex:1;min-width:0;font-size:.92rem;line-height:1.35}
+.inst .tx b{display:block;font-size:1rem}
+.inst .ibtn{font:inherit;font-weight:700;border:0;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:10px 16px;min-height:44px;cursor:pointer}
+.inst .ix{font:inherit;border:0;background:transparent;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:6px;line-height:1}
 </style>
 
 </head><body>
@@ -97,6 +104,7 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px)}
 </div></header>
 
 <div class="wrap"><main>
+  <section class="inst" id="inst" aria-live="polite"><img src="icon-192.png" alt="Ícone Agenda IFMT"><div class="tx"><b>Instale a Agenda IFMT</b><span id="instTx">Tenha o ícone na tela do seu aparelho e use mesmo sem internet.</span></div><button class="ibtn" id="instBtn" type="button">Instalar</button><button class="ix" id="instX" type="button" aria-label="Dispensar">×</button></section>
   <section class="unit" id="unitCard" aria-live="polite"></section>
   <div class="count" id="count"></div>
   <div class="list" id="list"></div>
@@ -278,6 +286,19 @@ paint();
 $("reload").addEventListener("click",refresh);
 refresh();setInterval(refresh,300000);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refresh()});
+
+(function(){
+  const box=document.getElementById("inst"),btn=document.getElementById("instBtn"),tx=document.getElementById("instTx"),x=document.getElementById("instX");
+  const standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  let dismissed=false;try{dismissed=localStorage.getItem("ifmt-inst-x")==="1"}catch(e){}
+  if(standalone||dismissed)return;
+  let dp=null;const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;box.classList.add("show")});
+  window.addEventListener("appinstalled",()=>box.classList.remove("show"));
+  if(ios){box.classList.add("show");tx.textContent="No Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.";btn.hidden=true}
+  btn.addEventListener("click",async()=>{if(!dp){tx.textContent="No menu do navegador (⋮), escolha “Instalar app” ou “Adicionar à tela inicial”.";return}dp.prompt();try{await dp.userChoice}catch(e){}dp=null;box.classList.remove("show")});
+  x.addEventListener("click",()=>{box.classList.remove("show");try{localStorage.setItem("ifmt-inst-x","1")}catch(e){}});
+})();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
 (async()=>{try{ART=await (window.claude&&window.claude.use?window.claude.use("artifact"):null)}catch(_){ART=null}
   })();
