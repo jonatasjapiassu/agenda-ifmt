@@ -64,6 +64,8 @@ main{padding-block:18px;display:flex;flex-direction:column;gap:14px}
 @media(max-width:560px){.phone{align-items:flex-start}}
 .phone .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600;font-size:1.25rem;color:var(--accent);overflow-wrap:anywhere}
 .phone .none{font-size:.9rem;color:var(--muted);font-style:italic}
+.phone .mail{font-family:var(--f-mono);font-size:.85rem;color:var(--accent);overflow-wrap:anywhere;text-decoration:none}
+.phone .mail:hover{text-decoration:underline}
 .phone .cel{font-family:var(--f-mono);font-size:.9rem;color:var(--ink)}
 .cp{font:inherit;font-size:.78rem;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:3px 9px;cursor:pointer}
 .cp:hover{color:var(--ink);border-color:var(--muted)}
@@ -245,10 +247,11 @@ function secCard(s,isRtr,u){
   if(s.nat)meta.push('<span class="pill">'+esc(s.nat)+"</span>");
   if(isRtr&&s.andar)meta.push('<span class="pill warn">'+esc(s.andar)+"</span>");
   const ft=fullTel(s.tel,u);const phone=s.tel?'<span class="num">'+esc(ft)+"</span>"+copyBtn(ft):'<span class="none">Ramal não informado</span>';
+  const mail=s.mail?'<a class="mail" href="mailto:'+esc(s.mail)+'">'+esc(s.mail)+"</a>":"";
   const cel=s.cel?'<span class="cel">Cel.: '+esc(s.cel)+"</span>":"";
   const resp=(s.resp||[]).length?'<div class="resp">'+s.resp.map(r=>'<div class="p"><span class="nm">'+esc(r.nome)+'</span><span class="cg">'+esc(r.cargo)+"</span>"+(r.ramal&&r.ramal!==s.tel?'<span class="rm">'+esc(fullTel(r.ramal,u))+"</span>":"")+(r.rdt&&r.rdt!=="PRESENCIAL"?'<span class="rdt">'+esc(r.rdt)+"</span>":"")+"</div>").join("")+"</div>":(isRtr?"":'<div class="resp"><span class="cg">Responsável: a preencher na planilha</span></div>');
-  const sub=isRtr&&s.subnome?'<div class="sub sn">'+esc(s.subnome)+"</div>":(s.mail?'<div class="sub">'+esc(s.mail)+"</div>":"")+(s.obs?'<div class="sub">'+esc(s.obs)+"</div>":"");
-  return '<article class="sec"><div><h3>'+esc(s.setor)+'</h3><div class="meta">'+meta.join("")+"</div>"+sub+'</div><div class="phone">'+phone+cel+"</div>"+resp+"</article>";
+  const sub=isRtr&&s.subnome?'<div class="sub sn">'+esc(s.subnome)+"</div>":(s.obs?'<div class="sub">'+esc(s.obs)+"</div>":"");
+  return '<article class="sec"><div><h3>'+esc(s.setor)+'</h3><div class="meta">'+meta.join("")+"</div>"+sub+'</div><div class="phone">'+phone+mail+cel+"</div>"+resp+"</article>";
 }
 function paint(){
   unitOptions();
